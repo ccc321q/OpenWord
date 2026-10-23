@@ -1,0 +1,70 @@
+/* ==========================================================================
+   OpenWord — print stylesheet (linked with media="print")
+   The app injects an @page rule with the current paper size and zero margins
+   before calling window.print(); the sheet itself already carries the page
+   margins as padding, so one sheet-width block equals one printed page.
+   ========================================================================== */
+@page { margin: 0; }
+
+/* hide every piece of chrome that is not the paper */
+body > *:not(.viewport) { display: none !important; }
+
+html, body {
+  background: #fff !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+body.theme-dark {
+  --paper: #ffffff;
+  --text: #111111;
+  --doc-font: Calibri, "Carlito", "Segoe UI", Arial, sans-serif;
+}
+body.theme-dark .doc, body.theme-dark .hf-area { color: #111; caret-color: transparent; }
+
+.viewport {
+  display: block !important;
+  overflow: visible !important;
+  height: auto !important;
+  background: #fff !important;
+}
+.find-panel { display: none !important; }
+
+#sheet-scaler {
+  padding: 0 !important;
+  zoom: 1 !important;
+  transform: none !important;
+  display: block !important;
+}
+#sheet {
+  box-shadow: none !important;
+  border: 0 !important;
+  margin: 0 !important;
+  background: #fff !important;
+}
+#page-guides { display: none !important; }
+
+/* editor-only decorations */
+.hf { border: none !important; }
+.hf.empty::before { content: none !important; }
+.doc .ww-field, .hf .ww-field { background: none !important; color: inherit !important; }
+.doc img.ww-selected { outline: none !important; }
+.ww-img-resizer, .ww-img-handle { display: none !important; }
+.hard-break { border: none !important; }
+.hard-break::after { content: none !important; display: none !important; }
+body.show-marks .doc p.ww-markable::after,
+body.show-marks .doc h1::after, body.show-marks .doc h2::after, body.show-marks .doc h3::after,
+body.show-marks .doc h4::after, body.show-marks .doc h5::after, body.show-marks .doc h6::after,
+body.show-marks .doc li::after,
+body.show-marks .doc .ww-tabmark::after { content: none !important; }
+body.view-focus .doc > * { opacity: 1 !important; }
+
+/* keep author colours and table shading */
+body, .doc, .hf-area {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* avoid orphaned headings at page bottoms */
+.doc h1, .doc h2, .doc h3, .doc h4, .doc h5, .doc h6 { break-after: avoid; page-break-after: avoid; }
+.doc table, .doc img { break-inside: avoid; page-break-inside: avoid; }
+.doc li { break-inside: avoid; page-break-inside: avoid; }

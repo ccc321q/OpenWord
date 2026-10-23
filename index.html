@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="OpenWord - a standalone, in-browser word processor with DOCX and Google Docs round-trip support.">
+<title>OpenWord — Word Processor</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232b579a'/%3E%3Ctext x='16' y='23' font-family='Arial' font-size='18' font-weight='bold' fill='white' text-anchor='middle'%3EW%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/editor.css">
+<link rel="stylesheet" href="css/print.css" media="print">
+</head>
+<body class="theme-light">
+
+<!-- ============================ ICON SPRITE ============================ -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-new" viewBox="0 0 16 16"><path d="M3 1h6l4 4v10H3z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M9 1v4h4" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-open" viewBox="0 0 16 16"><path d="M1.5 3h5l1.2 1.6H14V13H1.5z" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-save" viewBox="0 0 16 16"><path d="M2 2h9l3 3v9H2z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v4h5V2M5 14v-4h6v4" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-print" viewBox="0 0 16 16"><path d="M4 6V2h8v4M2 6h12v5H2z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M4 11h8v3H4z" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 16 16"><path d="M6 4L2.5 7.5 6 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.8 7.5H10a3.5 3.5 0 010 7H7" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 16 16"><path d="M10 4l3.5 3.5L10 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.2 7.5H6a3.5 3.5 0 000 7h3" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-cut" viewBox="0 0 16 16"><circle cx="4" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="12" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M5.4 10.6L13 2M10.6 10.6L3 2" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 16 16"><rect x="5" y="5" width="9" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M11 5V3a1 1 0 00-1-1H3a1 1 0 00-1 1v7a1 1 0 001 1h2" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-paste" viewBox="0 0 16 16"><path d="M4 3h2V1.5h4V3h2v11H4z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5h4" stroke="currentColor" stroke-width="1.2"/><path d="M6 7h4M6 9.5h4" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-painter" viewBox="0 0 16 16"><path d="M3 7h8v6H3z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M7 7V4a2 2 0 012-2h3" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M5 13v2h4v-2" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-ul" viewBox="0 0 16 16"><circle cx="2.5" cy="4" r="1.3" fill="currentColor"/><circle cx="2.5" cy="8" r="1.3" fill="currentColor"/><circle cx="2.5" cy="12" r="1.3" fill="currentColor"/><path d="M6 4h9M6 8h9M6 12h9" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-ol" viewBox="0 0 16 16"><text x="0" y="6" font-size="6" font-family="Arial" fill="currentColor">1</text><text x="0" y="10.2" font-size="6" font-family="Arial" fill="currentColor">2</text><text x="0" y="14.4" font-size="6" font-family="Arial" fill="currentColor">3</text><path d="M6 4h9M6 8h9M6 12h9" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-indent" viewBox="0 0 16 16"><path d="M5 3h9M9 6h5M9 10h5M5 13h9" stroke="currentColor" stroke-width="1.3"/><path d="M2 6.5l2.5 1.8L2 10z" fill="currentColor"/></symbol>
+  <symbol id="i-outdent" viewBox="0 0 16 16"><path d="M5 3h9M9 6h5M9 10h5M5 13h9" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 6.5L2 8.3l2.5 1.8z" fill="currentColor"/></symbol>
+  <symbol id="i-align-left" viewBox="0 0 16 16"><path d="M1 3h13M1 6.5h8M1 10h13M1 13.5h8" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-align-center" viewBox="0 0 16 16"><path d="M1 3h13M4 6.5h8M1 10h13M4 13.5h8" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-align-right" viewBox="0 0 16 16"><path d="M1 3h13M6 6.5h8M1 10h13M6 13.5h8" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-align-justify" viewBox="0 0 16 16"><path d="M1 3h13M1 6.5h13M1 10h13M1 13.5h13" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-color" viewBox="0 0 16 16"><text x="1" y="10" font-size="10" font-family="Georgia" font-weight="bold" fill="currentColor">A</text><rect x="0" y="12" width="16" height="3" fill="var(--swatch, #e03131)"/></symbol>
+  <symbol id="i-highlight" viewBox="0 0 16 16"><text x="1" y="10" font-size="10" font-family="Georgia" font-weight="bold" fill="currentColor">A</text><rect x="0" y="11.5" width="16" height="3.5" fill="var(--swatch, #fff56b)" opacity=".9"/></symbol>
+  <symbol id="i-clearformat" viewBox="0 0 16 16"><text x="1" y="11" font-size="10" font-family="Georgia" fill="currentColor">A</text><path d="M8 3l6 6M14 3l-6 6" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-link" viewBox="0 0 16 16"><path d="M6.5 9.5l3-3" stroke="currentColor" stroke-width="1.5"/><path d="M7 4.5l1.5-1.5a2.8 2.8 0 014 4L11 8.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 11.5L7.5 13a2.8 2.8 0 01-4-4L5 7.5" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="i-image" viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="5" cy="6.5" r="1.2" fill="currentColor"/><path d="M2 12l4-4 3 3 2.5-2 2.5 3" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-table" viewBox="0 0 16 16"><rect x="1" y="2.5" width="14" height="11" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M1 6.5h14M6 2.5v11M11 2.5v11" stroke="currentColor" stroke-width="1.1"/></symbol>
+  <symbol id="i-hr" viewBox="0 0 16 16"><path d="M1 8h14" stroke="currentColor" stroke-width="1.6"/><path d="M3 4h10M3 12h10" stroke="currentColor" stroke-width="0.9" opacity=".5"/></symbol>
+  <symbol id="i-pagebreak" viewBox="0 0 16 16"><path d="M3 1h6l3 3v4H3zM3 8v7h9v-2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M1 7.5h13" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"/></symbol>
+  <symbol id="i-header" viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 5h13" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 3h5M3.5 8h9M3.5 10.5h9M3.5 13h6" stroke="currentColor" stroke-width="1"/></symbol>
+  <symbol id="i-footer" viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 11h13" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 4h9M3.5 6.5h9M3.5 9h6M3.5 13h5" stroke="currentColor" stroke-width="1"/></symbol>
+  <symbol id="i-pagenum" viewBox="0 0 16 16"><rect x="2" y="1.5" width="12" height="13" fill="none" stroke="currentColor" stroke-width="1.2"/><text x="8" y="13" font-size="6.5" font-family="Arial" text-anchor="middle" fill="currentColor">1</text></symbol>
+  <symbol id="i-symbol" viewBox="0 0 16 16"><text x="2" y="12" font-size="12" font-family="Georgia" fill="currentColor">Ω</text></symbol>
+  <symbol id="i-find" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14.5 14.5" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-replace" viewBox="0 0 16 16"><path d="M1 5h8a3 3 0 010 6H5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 2.5L1 5l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M15 11H7" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M12.5 8.5L15 11l-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+  <symbol id="i-count" viewBox="0 0 16 16"><path d="M1 12l3-8 3 8M2 9.5h4" stroke="currentColor" stroke-width="1.2" fill="none"/><text x="8.5" y="13" font-size="9" font-family="Arial" fill="currentColor">123</text></symbol>
+  <symbol id="i-ruler" viewBox="0 0 16 16"><rect x="1" y="4" width="14" height="8" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M4 4v3M7 4v4.5M10 4v3M13 4v4.5" stroke="currentColor" stroke-width="1"/></symbol>
+  <symbol id="i-marks" viewBox="0 0 16 16"><text x="2" y="13" font-size="13" font-family="Georgia" fill="currentColor">¶</text></symbol>
+  <symbol id="i-zoom" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L14.5 14.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h4" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 16 16"><path d="M8 1.5L15 5l-7 3.5L1 5z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M2.5 8l5.5 2.8L13.5 8" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+  <symbol id="i-page-setup" viewBox="0 0 16 16"><rect x="2.5" y="1.5" width="11" height="13" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M5 4.5h6M5 7h6M5 9.5h3" stroke="currentColor" stroke-width="1"/></symbol>
+  <symbol id="i-orientation" viewBox="0 0 16 16"><rect x="1.5" y="4.5" width="13" height="7" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M4 7h8" stroke="currentColor" stroke-width="1"/></symbol>
+  <symbol id="i-margins" viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="4.5" y="4.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 1.5"/></symbol>
+  <symbol id="i-close" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 16 16"><path d="M2.5 8.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-gdoc" viewBox="0 0 16 16"><path d="M3.5 1.5h6l3.5 3.5v9.5h-9.5z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M9.5 1.5V5H13" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 8h5M5.5 10.5h5" stroke="currentColor" stroke-width="1"/></symbol>
+  <symbol id="i-theme" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 2v12a6 6 0 000-12z" fill="currentColor"/></symbol>
+</svg>
+
+<!-- ============================ TOP BAR ============================ -->
+<header class="topbar">
+  <div class="brand" title="OpenWord">
+    <span class="brand-mark">W</span>
+    <span class="brand-text">OpenWord</span>
+  </div>
+  <div class="doc-title-wrap">
+    <button id="doc-title" class="doc-title" title="Rename document (Enter to confirm)">Untitled document</button>
+    <span id="dirty-dot" class="dirty-dot" hidden title="Unsaved changes">&bull;</span>
+    <span id="save-state" class="save-state">Saved</span>
+  </div>
+  <div class="qat">
+    <button class="icon-btn" data-cmd="new" title="New (Ctrl+Alt+N)"><svg class="ic"><use href="#i-new"/></svg></button>
+    <button class="icon-btn" data-cmd="open" title="Open file (Ctrl+O)"><svg class="ic"><use href="#i-open"/></svg></button>
+    <button class="icon-btn" data-cmd="save-docx" title="Save as .docx (Ctrl+S)"><svg class="ic"><use href="#i-save"/></svg></button>
+    <button class="icon-btn" data-cmd="print" title="Print (Ctrl+P)"><svg class="ic"><use href="#i-print"/></svg></button>
+    <span class="qat-sep"></span>
+    <button class="icon-btn" id="qat-undo" data-cmd="undo" title="Undo (Ctrl+Z)"><svg class="ic"><use href="#i-undo"/></svg></button>
+    <button class="icon-btn" id="qat-redo" data-cmd="redo" title="Redo (Ctrl+Y)"><svg class="ic"><use href="#i-redo"/></svg></button>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" id="btn-theme" title="Toggle dark / light theme"><svg class="ic"><use href="#i-theme"/></svg></button>
+  </div>
+</header>
+
+<!-- ============================ MENU BAR ============================ -->
+<nav class="menubar" id="menubar" aria-label="Main menu">
+  <div class="menu" data-menu="file"><button class="menu-label">File</button></div>
+  <div class="menu" data-menu="edit"><button class="menu-label">Edit</button></div>
+  <div class="menu" data-menu="view"><button class="menu-label">View</button></div>
+  <div class="menu" data-menu="insert"><button class="menu-label">Insert</button></div>
+  <div class="menu" data-menu="format"><button class="menu-label">Format</button></div>
+  <div class="menu" data-menu="tools"><button class="menu-label">Tools</button></div>
+  <div class="menu" data-menu="help"><button class="menu-label">Help</button></div>
+</nav>
+
+<!-- ============================ RIBBON ============================ -->
+<div class="ribbon" id="ribbon">
+  <div class="ribbon-tabs" role="tablist">
+    <button class="ribbon-tab active" data-tab="home" role="tab">Home</button>
+    <button class="ribbon-tab" data-tab="insert" role="tab">Insert</button>
+    <button class="ribbon-tab" data-tab="layout" role="tab">Layout</button>
+    <button class="ribbon-tab" data-tab="tools" role="tab">Tools</button>
+  </div>
+
+  <!-- HOME -->
+  <div class="ribbon-panel active" data-panel="home">
+    <div class="rgroup">
+      <button class="rbtn big" data-cmd="paste" title="Paste (Ctrl+V)"><svg class="ic"><use href="#i-paste"/></svg><span>Paste</span></button>
+      <div class="rstack">
+        <button class="rbtn sm" data-cmd="cut" title="Cut (Ctrl+X)"><svg class="ic"><use href="#i-cut"/></svg><span>Cut</span></button>
+        <button class="rbtn sm" data-cmd="copy" title="Copy (Ctrl+C)"><svg class="ic"><use href="#i-copy"/></svg><span>Copy</span></button>
+        <button class="rbtn sm" id="btn-painter" data-cmd="format-painter" title="Format Painter (Ctrl+Alt+C / Ctrl+Alt+V)"><svg class="ic"><use href="#i-painter"/></svg><span>Painter</span></button>
+      </div>
+      <div class="rgroup-label">Clipboard</div>
+    </div>
+
+    <div class="rgroup">
+      <div class="rrow">
+        <select id="font-family" class="rselect font-select" title="Font" data-cmd="font-family"></select>
+        <select id="font-size" class="rselect size-select" title="Font size" data-cmd="font-size"></select>
+      </div>
+      <div class="rrow">
+        <button class="rbtn sm nt" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+        <button class="rbtn sm nt" data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+        <button class="rbtn sm nt" data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+        <button class="rbtn sm nt" data-cmd="strikeThrough" title="Strikethrough (Ctrl+Shift+X)"><s>S</s></button>
+        <button class="rbtn sm nt" data-cmd="subscript" title="Subscript (Ctrl+=)">X<sub>s</sub></button>
+        <button class="rbtn sm nt" data-cmd="superscript" title="Superscript (Ctrl+Shift++)">X<sup>s</sup></button>
+        <span class="splitter"></span>
+        <span class="menu-btn-wrap">
+          <button class="rbtn sm nt color-main" id="color-main" title="Text colour"><svg class="ic"><use href="#i-color"/></svg></button>
+          <button class="rbtn sm nt caret" data-dialog="color" title="More colours"><svg class="ic caret-ic"><use href="#i-chevron"/></svg></button>
+        </span>
+        <span class="menu-btn-wrap">
+          <button class="rbtn sm nt color-main" id="highlight-main" title="Text highlight colour"><svg class="ic"><use href="#i-highlight"/></svg></button>
+          <button class="rbtn sm nt caret" data-dialog="highlight" title="More highlight colours"><svg class="ic caret-ic"><use href="#i-chevron"/></svg></button>
+        </span>
+        <button class="rbtn sm nt" data-cmd="clear-formatting" title="Clear formatting (Ctrl+Space)"><svg class="ic"><use href="#i-clearformat"/></svg></button>
+      </div>
+      <div class="rgroup-label">Font</div>
+    </div>
+
+    <div class="rgroup">
+      <div class="rrow">
+        <button class="rbtn sm" data-cmd="insertUnorderedList" title="Bulleted list (Ctrl+Shift+8)"><svg class="ic"><use href="#i-ul"/></svg></button>
+        <button class="rbtn sm" data-cmd="insertOrderedList" title="Numbered list (Ctrl+Shift+7)"><svg class="ic"><use href="#i-ol"/></svg></button>
+        <span class="splitter"></span>
+        <button class="rbtn sm" data-cmd="outdent" title="Decrease indent (Shift+Tab)"><svg class="ic"><use href="#i-outdent"/></svg></button>
+        <button class="rbtn sm" data-cmd="indent" title="Increase indent (Tab)"><svg class="ic"><use href="#i-indent"/></svg></button>
+        <span class="splitter"></span>
+        <button class="rbtn sm" data-cmd="justifyLeft" title="Align left (Ctrl+Shift+L)"><svg class="ic"><use href="#i-align-left"/></svg></button>
+        <button class="rbtn sm" data-cmd="justifyCenter" title="Center (Ctrl+Shift+E)"><svg class="ic"><use href="#i-align-center"/></svg></button>
+        <button class="rbtn sm" data-cmd="justifyRight" title="Align right (Ctrl+Shift+R)"><svg class="ic"><use href="#i-align-right"/></svg></button>
+        <button class="rbtn sm" data-cmd="justifyFull" title="Justify (Ctrl+J)"><svg class="ic"><use href="#i-align-justify"/></svg></button>
+      </div>
+      <div class="rrow">
+        <select id="line-spacing" class="rselect" title="Line spacing">
+          <option value="">Line spacing&hellip;</option>
+          <option value="1">1.0</option>
+          <option value="1.15">1.15</option>
+          <option value="1.5">1.5</option>
+          <option value="2">2.0</option>
+          <option value="dialog">Spacing options&hellip;</option>
+        </select>
+        <button class="rbtn sm" data-dialog="paragraph" title="Paragraph options">Paragraph&hellip;</button>
+        <select id="block-style" class="rselect style-select" title="Paragraph style"></select>
+      </div>
+      <div class="rgroup-label">Paragraph</div>
+    </div>
+
+    <div class="rgroup grow">
+      <div class="style-gallery" id="style-gallery"></div>
+      <div class="rgroup-label">Styles</div>
+    </div>
+
+    <div class="rgroup">
+      <div class="rstack">
+        <button class="rbtn sm" data-panel-find title="Find and replace (Ctrl+F)"><svg class="ic"><use href="#i-find"/></svg><span>Find/Replace</span></button>
+        <button class="rbtn sm" data-cmd="select-all" title="Select all (Ctrl+A)"><span>Select all</span></button>
+      </div>
+      <div class="rgroup-label">Editing</div>
+    </div>
+  </div>
+
+  <!-- INSERT -->
+  <div class="ribbon-panel" data-panel="insert">
+    <div class="rgroup">
+      <button class="rbtn big" data-dialog="table" title="Insert table"><svg class="ic"><use href="#i-table"/></svg><span>Table</span></button>
+      <div class="rgroup-label">Tables</div>
+    </div>
+    <div class="rgroup">
+      <button class="rbtn big" data-dialog="image" title="Insert picture from file or URL"><svg class="ic"><use href="#i-image"/></svg><span>Picture</span></button>
+      <button class="rbtn big" data-dialog="link" title="Insert link (Ctrl+K)"><svg class="ic"><use href="#i-link"/></svg><span>Link</span></button>
+      <div class="rgroup-label">Illustrations &amp; links</div>
+    </div>
+    <div class="rgroup">
+      <div class="rstack">
+        <button class="rbtn sm" data-cmd="insert-header" title="Add / edit header"><svg class="ic"><use href="#i-header"/></svg><span>Header</span></button>
+        <button class="rbtn sm" data-cmd="insert-footer" title="Add / edit footer"><svg class="ic"><use href="#i-footer"/></svg><span>Footer</span></button>
+        <button class="rbtn sm" data-cmd="insert-page-number" title="Insert page number field"><svg class="ic"><use href="#i-pagenum"/></svg><span>Page number</span></button>
+      </div>
+      <div class="rgroup-label">Page parts</div>
+    </div>
+    <div class="rgroup">
+      <div class="rstack">
+        <button class="rbtn sm" data-cmd="insertHorizontalRule" title="Horizontal line"><svg class="ic"><use href="#i-hr"/></svg><span>Horizontal line</span></button>
+        <button class="rbtn sm" data-cmd="insert-page-break" title="Page break (Ctrl+Enter)"><svg class="ic"><use href="#i-pagebreak"/></svg><span>Page break</span></button>
+        <button class="rbtn sm" data-dialog="symbol" title="Special character"><svg class="ic"><use href="#i-symbol"/></svg><span>Special char</span></button>
+      </div>
+      <div class="rgroup-label">Formatting marks</div>
+    </div>
+    <div class="rgroup grow">
+      <div class="rstack">
+        <button class="rbtn sm" data-cmd="insert-date" title="Insert current date">Insert date</button>
+        <button class="rbtn sm" data-cmd="insert-datetime" title="Insert current date and time">Insert date &amp; time</button>
+        <button class="rbtn sm" data-cmd="insert-toc" title="Insert a table of contents built from headings">Insert table of contents</button>
+      </div>
+      <div class="rgroup-label">Auto text</div>
+    </div>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="ribbon-panel" data-panel="layout">
+    <div class="rgroup">
+      <div class="rstack">
+        <button class="rbtn sm" data-cmd="orientation" title="Switch portrait / landscape"><svg class="ic"><use href="#i-orientation"/></svg><span>Orientation</span></button>
+        <button class="rbtn sm" data-dialog="page-setup" title="Page setup"><svg class="ic"><use href="#i-page-setup"/></svg><span>Page setup</span></button>
+        <select id="page-size" class="rselect" title="Paper size">
+          <option value="Letter">Letter 8.5&times;11"</option>
+          <option value="A4">A4 21&times;29.7cm</option>
+          <option value="Legal">Legal 8.5&times;14"</option>
+          <option value="A3">A3 29.7&times;42cm</option>
+          <option value="A5">A5 14.8&times;21cm</option>
+          <option value="Tabloid">Tabloid 11&times;17"</option>
+        </select>
+      </div>
+      <div class="rgroup-label">Page</div>
+    </div>
+    <div class="rgroup">
+      <select id="margins-preset" class="rselect wide" title="Margins">
+        <option value="dialog">Margins&hellip;</option>
+        <option value="1">Normal (1")</option>
+        <option value="0.5">Narrow (0.5")</option>
+        <option value="1.5">Moderate (1.5")</option>
+        <option value="2">Wide (2")</option>
+      </select>
+      <div class="rgroup-label">Margins</div>
+    </div>
+    <div class="rgroup">
+      <div class="rstack">
+        <button class="rbtn sm toggle" id="btn-ruler" data-cmd="toggle-ruler" title="Show / hide ruler"><svg class="ic"><use href="#i-ruler"/></svg><span>Ruler</span></button>
+        <button class="rbtn sm toggle" id="btn-marks" data-cmd="toggle-marks" title="Show / hide formatting marks"><svg class="ic"><use href="#i-marks"/></svg><span>Marks</span></button>
+        <button class="rbtn sm toggle" id="btn-grid" data-cmd="toggle-grid" title="Show page boundary guides"><span>Guides</span></button>
+      </div>
+      <div class="rgroup-label">Show</div>
+    </div>
+    <div class="rgroup">
+      <div class="rstack">
+        <select id="view-mode" class="rselect" title="View mode">
+          <option value="print">Print layout</option>
+          <option value="web">Web layout</option>
+          <option value="focus">Focus mode</option>
+        </select>
+        <div class="zoom-row">
+          <button class="rbtn sm" data-cmd="zoom-out" title="Zoom out">&minus;</button>
+          <span id="zoom-label" class="zoom-label">100%</span>
+          <button class="rbtn sm" data-cmd="zoom-in" title="Zoom in">+</button>
+          <button class="rbtn sm" data-cmd="zoom-reset" title="Reset zoom">100%</button>
+        </div>
+      </div>
+      <div class="rgroup-label">View</div>
+    </div>
+  </div>
+
+  <!-- TOOLS -->
+  <div class="ribbon-panel" data-panel="tools">
+    <div class="rgroup">
+      <button class="rbtn big" data-panel-find title="Find and replace"><svg class="ic"><use href="#i-find"/></svg><span>Find &amp;<br>Replace</span></button>
+      <div class="rstack">
+        <button class="rbtn sm" data-dialog="word-count" title="Word count statistics"><svg class="ic"><use href="#i-count"/></svg><span>Word count</span></button>
+        <button class="rbtn sm toggle" id="btn-spellcheck" data-cmd="toggle-spellcheck" title="Spell check"><span>Spell check</span></button>
+      </div>
+      <div class="rgroup-label">Proofing</div>
+    </div>
+    <div class="rgroup">
+      <div class="rstack">
+        <button class="rbtn sm" data-cmd="save-docx" title="Save as .docx"><svg class="ic"><use href="#i-save"/></svg><span>Save .docx</span></button>
+        <button class="rbtn sm" data-cmd="save-gdoc" title="Save a .docx prepared for Google Docs and show upload steps"><svg class="ic"><use href="#i-gdoc"/></svg><span>Google Docs</span></button>
+        <button class="rbtn sm" data-cmd="save-html" title="Save as .html"><span>Save .html</span></button>
+        <button class="rbtn sm" data-cmd="save-txt" title="Save as .txt"><span>Save .txt</span></button>
+        <button class="rbtn sm" data-cmd="save-odt" title="Save as OpenDocument .odt"><span>Save .odt</span></button>
+      </div>
+      <div class="rgroup-label">Save &amp; export</div>
+    </div>
+    <div class="rgroup">
+      <div class="rstack">
+        <button class="rbtn sm" data-cmd="open" title="Open a document"><svg class="ic"><use href="#i-open"/></svg><span>Open&hellip;</span></button>
+        <button class="rbtn sm" data-dialog="samples" title="Open a sample document"><span>Sample docs</span></button>
+        <button class="rbtn sm" data-cmd="import-html" title="Import HTML fragment into the document at the cursor"><span>Import HTML&hellip;</span></button>
+      </div>
+      <div class="rgroup-label">Files</div>
+    </div>
+    <div class="rgroup">
+      <div class="rstack">
+        <button class="rbtn sm" data-dialog="preferences" title="Editor preferences"><span>Preferences</span></button>
+        <button class="rbtn sm" data-cmd="print" title="Print / save as PDF"><span>Print / PDF</span></button>
+        <button class="rbtn sm" data-cmd="clear-autosave" title="Delete the locally stored autosave copy"><span>Clear autosave</span></button>
+      </div>
+      <div class="rgroup-label">General</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ RULER ============================ -->
+<div class="ruler-wrap" id="ruler-wrap"><canvas id="ruler" height="26"></canvas></div>
+
+<!-- ============================ DOCUMENT AREA ============================ -->
+<main class="viewport" id="viewport">
+  <div class="sheet-scaler" id="sheet-scaler">
+    <div class="sheet" id="sheet">
+      <div class="hf header hf-area" id="page-header" contenteditable="true" data-hf="header" aria-label="Header"></div>
+      <div class="doc" id="editor" contenteditable="true" spellcheck="true" role="textbox" aria-multiline="true" aria-label="Document content"></div>
+      <div class="hf footer hf-area" id="page-footer" contenteditable="true" data-hf="footer" aria-label="Footer"></div>
+      <div class="page-guides" id="page-guides" aria-hidden="true"></div>
+    </div>
+  </div>
+  <aside class="find-panel" id="find-panel" hidden>
+    <div class="find-head">
+      <span>Find and replace</span>
+      <button class="icon-btn sm" id="find-close" title="Close (Esc)"><svg class="ic"><use href="#i-close"/></svg></button>
+    </div>
+    <div class="find-body">
+      <label class="find-row"><input type="text" id="find-input" placeholder="Find" autocomplete="off"></label>
+      <div class="find-row opts">
+        <label class="chk"><input type="checkbox" id="find-case"> Match case</label>
+        <label class="chk"><input type="checkbox" id="find-word"> Whole word</label>
+      </div>
+      <div class="find-row nav">
+        <span id="find-status" class="find-status">0 results</span>
+        <button class="btn sm" id="find-prev" title="Previous (Shift+Enter)">&uarr;</button>
+        <button class="btn sm" id="find-next" title="Next (Enter)">&darr;</button>
+      </div>
+      <label class="find-row"><input type="text" id="replace-input" placeholder="Replace with" autocomplete="off"></label>
+      <div class="find-row">
+        <button class="btn sm" id="replace-one">Replace</button>
+        <button class="btn sm" id="replace-all">Replace all</button>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- ============================ STATUS BAR ============================ -->
+<footer class="statusbar">
+  <div class="status-left">
+    <span id="status-page">Page 1 of 1</span>
+    <span class="status-sep">|</span>
+    <span id="status-words">0 words</span>
+    <span class="status-sep">|</span>
+    <span id="status-chars">0 characters</span>
+    <span class="status-sep">|</span>
+    <span id="status-read">0 min read</span>
+  </div>
+  <div class="status-right">
+    <span id="status-format" class="status-format"></span>
+    <button class="status-btn" data-cmd="zoom-out" title="Zoom out">&minus;</button>
+    <input type="range" id="zoom-range" min="50" max="250" step="10" value="100" title="Zoom">
+    <button class="status-btn" data-cmd="zoom-in" title="Zoom in">+</button>
+    <span id="status-zoom" class="zoom-readout">100%</span>
+    <select id="status-view" class="status-select" title="View mode">
+      <option value="print">Print Layout</option>
+      <option value="web">Web Layout</option>
+      <option value="focus">Focus</option>
+    </select>
+  </div>
+</footer>
+
+<!-- ============================ CONTEXT MENU ============================ -->
+<ul class="ctx-menu" id="ctx-menu" hidden></ul>
+
+<!-- ============================ DIALOGS ============================ -->
+<div class="modal-backdrop" id="modal-backdrop" hidden>
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <header class="modal-head"><h2 id="modal-title">Dialog</h2>
+      <button class="icon-btn sm" id="modal-close" title="Close"><svg class="ic"><use href="#i-close"/></svg></button></header>
+    <div class="modal-body" id="modal-body"></div>
+    <footer class="modal-foot" id="modal-foot"></footer>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
+
+<input type="file" id="file-input" accept=".docx,.dotx,.odt,.html,.htm,.txt,.rtf,.gdoc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text,text/html,text/plain" hidden multiple>
+<input type="file" id="image-input" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" hidden>
+
+<!-- ============================ SCRIPTS (classic, file:// friendly) ============================ -->
+<script src="vendor/jszip.min.js"></script>
+<script src="vendor/purify.min.js"></script>
+<script src="js/core/util.js"></script>
+<script src="js/core/selection.js"></script>
+<script src="js/core/docx-export.js"></script>
+<script src="js/core/docx-import.js"></script>
+<script src="js/core/odt.js"></script>
+<script src="js/core/html-io.js"></script>
+<script src="js/core/commands.js"></script>
+<script src="js/core/history.js"></script>
+<script src="js/core/find.js"></script>
+<script src="js/core/pages.js"></script>
+<script src="js/core/storage.js"></script>
+<script src="js/core/dialogs.js"></script>
+<script src="js/core/menus.js"></script>
+<script src="js/core/shortcuts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

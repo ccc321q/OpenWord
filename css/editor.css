@@ -1,0 +1,122 @@
+/* ==========================================================================
+   OpenWord — document (paper) styles
+   These styles describe the *content*; anything that must survive a round trip
+   through .docx is additionally written as an inline style by the exporter.
+   ========================================================================== */
+.doc, .hf-area {
+  --doc-font: Calibri, "Carlito", "Segoe UI", Arial, sans-serif;
+  font-family: var(--doc-font);
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #111;
+  caret-color: #111;
+}
+body.theme-dark .doc, body.theme-dark .hf-area { color: #eaeaea; }
+
+/* -------------------------------------------------- blocks ------------------------------------------------- */
+.doc p, .doc h1, .doc h2, .doc h3, .doc h4, .doc h5, .doc h6, .doc blockquote, .doc pre, .hf p {
+  margin: 0 0 8pt;
+  padding: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.doc h1 { font-size: 20pt; line-height: 1.3; margin: 12pt 0 6pt; font-weight: 600; color: #2b579a; }
+.doc h2 { font-size: 16pt; line-height: 1.3; margin: 11pt 0 5pt; font-weight: 600; color: #2b579a; }
+.doc h3 { font-size: 13.5pt; line-height: 1.3; margin: 10pt 0 4pt; font-weight: 600; color: #3b5b8c; }
+.doc h4 { font-size: 12pt; line-height: 1.3; margin: 9pt 0 4pt; font-weight: 600; font-style: italic; color: #3b5b8c; }
+.doc h5 { font-size: 11pt; line-height: 1.3; margin: 8pt 0 3pt; font-weight: 700; }
+.doc h6 { font-size: 11pt; line-height: 1.3; margin: 8pt 0 3pt; font-weight: 700; font-style: italic; color: #444; }
+.doc .ww-title { font-size: 26pt; line-height: 1.2; font-weight: 400; color: #2b579a; margin: 0 0 4pt; }
+.doc .ww-subtitle { font-size: 13pt; font-weight: 400; font-style: italic; color: #5b7a9d; margin: 0 0 16pt; }
+.doc .ww-quote { font-style: italic; margin-left: 24pt; margin-right: 24pt; color: #333; }
+.doc .ww-intense-quote { font-style: italic; color: #2b579a; margin-left: 24pt; border-left: 3px solid #2b579a; padding-left: 10pt; }
+body.theme-dark .doc .ww-intense-quote, body.theme-dark .doc .ww-quote { color: #b8cdec; }
+.doc blockquote { font-style: italic; margin: 8pt 24pt; color: #444; }
+body.theme-dark .doc blockquote { color: #c8c6c4; }
+.doc pre {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace; font-size: 10pt;
+  background: #f5f5f5; border: 1px solid #e5e5e5; border-radius: 3px; padding: 8pt; white-space: pre-wrap;
+}
+body.theme-dark .doc pre { background: #1f1f1f; border-color: #3a3a3a; }
+.doc ul, .doc ol { margin: 0 0 8pt; padding-left: 30pt; }
+.doc li { margin: 0; padding-left: 3pt; }
+.doc li > p { margin: 0; }
+.doc ul { list-style-type: disc; }
+.doc ul ul { list-style-type: circle; }
+.doc ul ul ul { list-style-type: square; }
+.doc ol { list-style-type: decimal; }
+.doc hr {
+  border: 0; border-top: 1px solid #8f8f8f; margin: 10pt 0; height: 0;
+}
+.doc a { color: #0563c1; text-decoration: underline; cursor: text; }
+.doc a.ww-toc-entry { text-decoration: none; color: inherit; }
+.doc table { border-collapse: collapse; margin: 0 0 8pt; table-layout: fixed; }
+.doc td, .doc th { border: 1px solid #ababab; padding: 4pt 6pt; vertical-align: top; }
+.doc th { font-weight: 600; background: #eaeff7; text-align: left; }
+.doc img { max-width: 100%; height: auto; }
+.doc figure { margin: 8pt 0; }
+.doc figcaption { font-size: 9pt; color: #666; font-style: italic; }
+
+/* list style overrides set by the numbering importer / list-type picker */
+.doc ul[data-ww-list-type="none"]  { list-style-type: none; }
+.doc ol[data-ww-list-type="lower-alpha"]  { list-style-type: lower-alpha; }
+.doc ol[data-ww-list-type="upper-alpha"]  { list-style-type: upper-alpha; }
+.doc ol[data-ww-list-type="lower-roman"]  { list-style-type: lower-roman; }
+.doc ol[data-ww-list-type="upper-roman"]  { list-style-type: upper-roman; }
+.doc ol[data-ww-list-type="decimal-zero"] { list-style-type: decimal-leading-zero; }
+.doc ol[data-ww-list-type="none"]  { list-style-type: none; }
+.doc li[data-ww-value]::marker { content: attr(data-ww-value) ". "; }
+
+/* -------------------------------------------------- inline ------------------------------------------------- */
+.doc b, .doc strong { font-weight: 700; }
+.doc i, .doc em { font-style: italic; }
+.doc u { text-decoration: underline; }
+.doc s, .doc strike, .doc del { text-decoration: line-through; }
+.doc sub { font-size: .72em; vertical-align: sub; }
+.doc sup { font-size: .72em; vertical-align: super; }
+.doc .ww-field {
+  background: #e8eef8; border-radius: 2px; padding: 0 2px; color: #2b579a;
+}
+body.theme-dark .doc .ww-field { background: #2d3f5c; color: #9cc0f0; }
+
+/* -------------------------------------------------- images ------------------------------------------------- */
+.doc img.ww-selected { outline: 2px solid var(--blue); }
+.ww-img-resizer {
+  position: absolute; z-index: 60; border: 1px dashed var(--blue); pointer-events: none;
+}
+.ww-img-handle {
+  position: absolute; width: 9px; height: 9px; background: #fff; border: 1px solid var(--blue);
+  border-radius: 2px; pointer-events: auto;
+}
+.ww-img-handle.se { right: -5px; bottom: -5px; cursor: nwse-resize; }
+.ww-img-handle.sw { left: -5px; bottom: -5px; cursor: nesw-resize; }
+
+/* -------------------------------------------------- selection / caret extras ------------------------------ */
+.doc [contenteditable="true"]:focus { outline: none; }
+.ww-hl { background: rgba(255, 214, 0, .45); }
+.ww-hl-active { background: rgba(255, 120, 0, .6); outline: 1px solid #ff7800; }
+/* CSS Custom Highlight API registration (find results, no DOM mutation) */
+::highlight(ww-find) { background-color: rgba(255, 214, 0, .55); }
+::highlight(ww-find-active) { background-color: rgba(255, 120, 0, .65); color: #fff; }
+
+/* -------------------------------------------------- formatting marks ------------------------------------- */
+body.show-marks .doc p.ww-markable::after,
+body.show-marks .doc h1::after, body.show-marks .doc h2::after, body.show-marks .doc h3::after,
+body.show-marks .doc h4::after, body.show-marks .doc h5::after, body.show-marks .doc h6::after,
+body.show-marks .doc li::after {
+  content: "\00B6"; color: #b5b5b5; font-weight: 400; font-style: normal; margin-left: 1px;
+}
+body.show-marks .doc .ww-tabmark::after { content: "\2192"; color: #b5b5b5; }
+body.show-marks .doc { tab-size: 24pt; }
+
+/* -------------------------------------------------- header / footer ------------------------------------- */
+.hf.header { min-height: 0.5in; }
+.hf.footer { min-height: 0.5in; }
+.hf p { margin: 0; }
+.hf .ww-field { color: inherit; }
+
+/* -------------------------------------------------- print layout helpers -------------------------------- */
+.ww-pagebreak { break-after: page; page-break-after: always; }
+.ww-nobreak { break-inside: avoid; }
+body.view-web .doc { max-width: 100%; }
